@@ -19,11 +19,11 @@ declare(strict_types=1);
 
 namespace Google\Auth;
 
-use Firebase\JWT\JWT;
 use Firebase\JWT\JWK;
+use Firebase\JWT\JWT;
 use Google\Auth\Http\ClientFactory;
-use Google\Auth\Jwt\FirebaseJwtClient;
-use Google\Auth\Jwt\JwtClientInterface;
+use Google\Jwt\Client\FirebaseClient;
+use Google\Jwt\ClientInterface;
 use GuzzleHttp\Psr7;
 use GuzzleHttp\Psr7\Request;
 use InvalidArgumentException;
@@ -264,7 +264,7 @@ class OAuth2
     private $httpClient;
 
     /**
-     * @var JwtClientInterface
+     * @var ClientInterface
      */
     private $jwtClient;
 
@@ -380,7 +380,7 @@ class OAuth2
 
         $this->httpClient = $opts['httpClient'] ?: ClientFactory::build();
         $this->jwtClient = $opts['jwtClient']
-            ?: new FirebaseJwtClient(new JWT(), new JWK());
+            ?: new FirebaseClient(new JWT(), new JWK());
         $this->setAuthorizationUri($opts['authorizationUri']);
         $this->setRedirectUri($opts['redirectUri']);
         $this->setTokenCredentialUri($opts['tokenCredentialUri']);

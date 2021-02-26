@@ -17,18 +17,14 @@
 
 namespace Google\Auth\Credentials\Tests;
 
-use Google\Auth\ApplicationDefaultCredentials;
 use Google\Auth\Credentials\ServiceAccountCredentials;
-use Google\Auth\Credentials\ServiceAccountJwtAccessCredentials;
-use Google\Auth\CredentialsLoader;
 use Google\Auth\OAuth2;
-use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
-use PHPUnit\Framework\TestCase;
-use DomainException;
+use GuzzleHttp\Psr7\Response;
 use InvalidArgumentException;
 use LogicException;
+use PHPUnit\Framework\TestCase;
 
 class ServiceAccountCredentialsTest extends TestCase
 {

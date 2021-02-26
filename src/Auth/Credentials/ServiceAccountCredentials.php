@@ -19,10 +19,10 @@ declare(strict_types=1);
 
 namespace Google\Auth\Credentials;
 
-use Google\Auth\SignBlob\ServiceAccountApiSignBlobTrait;
-use Google\Auth\SignBlob\PrivateKeySignBlobTrait;
-use Google\Auth\SignBlob\SignBlobInterface;
 use Google\Auth\OAuth2;
+use Google\Auth\SignBlob\PrivateKeySignBlobTrait;
+use Google\Auth\SignBlob\ServiceAccountApiSignBlobTrait;
+use Google\Auth\SignBlob\SignBlobInterface;
 use InvalidArgumentException;
 
 /**

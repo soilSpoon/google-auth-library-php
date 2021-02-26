@@ -20,17 +20,16 @@ declare(strict_types=1);
 namespace Google\Auth;
 
 use DomainException;
-use Firebase\JWT\JWT;
 use Firebase\JWT\JWK;
+use Firebase\JWT\JWT;
 use Google\Auth\Credentials\ComputeCredentials;
-use Google\Auth\Credentials\ServiceAccountCredentials;
-use Google\Auth\Credentials\ServiceAccountJwtAccessCredentials;
 use Google\Auth\Credentials\CredentialsInterface;
+use Google\Auth\Credentials\ServiceAccountCredentials;
 use Google\Auth\Credentials\UserRefreshCredentials;
 use Google\Auth\Http\ClientFactory;
-use Google\Auth\Jwt\FirebaseJwtClient;
-use Google\Auth\Jwt\JwtClientInterface;
 use Google\Cache\MemoryCacheItemPool;
+use Google\Jwt\Client\FirebaseClient;
+use Google\Jwt\ClientInterface;
 use GuzzleHttp\Psr7\Request;
 use InvalidArgumentException;
 use Psr\Cache\CacheItemPoolInterface;
@@ -101,7 +100,7 @@ class GoogleAuth
      *
      * @param array $options {
      *      @type ClientInterface $httpClient client which delivers psr7 request
-     *      @type JwtClientInterface $jwtClient
+     *      @type ClientInterface $jwtClient
      *      @type CacheItemPoolInterface $cache A cache implementation, may be
      *             provided if you have one already available for use.
      *      @type int $cacheLifetime
@@ -122,7 +121,7 @@ class GoogleAuth
         $this->cachePrefix = $options['cachePrefix'];
         $this->httpClient = $options['httpClient'] ?: ClientFactory::build();
         $this->jwtClient = $options['jwtClient']
-            ?: new FirebaseJwtClient(new JWT(), new JWK());
+            ?: new FirebaseClient(new JWT(), new JWK());
     }
 
     /**

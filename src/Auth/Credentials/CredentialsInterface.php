@@ -17,8 +17,6 @@
 
 namespace Google\Auth\Credentials;
 
-use Google\Http\ClientInterface;
-
 /**
  * An interface implemented by objects that can fetch auth tokens.
  */

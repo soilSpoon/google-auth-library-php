@@ -18,11 +18,11 @@
 namespace Google\Auth\Credentials\Tests;
 
 use Google\Auth\Credentials\CredentialsTrait;
+use LogicException;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
-use LogicException;
 
 class CredentialsTraitTest extends TestCase
 {

@@ -17,18 +17,17 @@
 
 namespace Google\Auth\Tests;
 
-use Google\Auth\OAuth2;
 use Google\Auth\Credentials\ComputeCredentials;
 use Google\Auth\Credentials\CredentialsInterface;
 use Google\Auth\Credentials\OAuth2Credentials;
 use Google\Auth\Credentials\ServiceAccountCredentials;
 use Google\Auth\Credentials\ServiceAccountJwtAccessCredentials;
 use Google\Auth\Credentials\UserRefreshCredentials;
-use Google\Cache\MemoryCacheItemPool;
+use Google\Auth\OAuth2;
+use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
-use Prophecy\Argument;
-use PHPUnit\Framework\TestCase;
 
 class CredentialsTest extends TestCase
 {

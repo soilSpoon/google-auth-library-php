@@ -19,8 +19,8 @@ declare(strict_types=1);
 
 namespace Google\Auth\Http;
 
-use Google\Http\ClientInterface;
 use Google\Http\Client\GuzzleClient;
+use Google\Http\ClientInterface;
 use GuzzleHttp\Client;
 
 class ClientFactory

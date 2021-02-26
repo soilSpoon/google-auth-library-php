@@ -18,10 +18,8 @@
 namespace Google\Auth\Credentials\Tests;
 
 use Google\Auth\Credentials\ComputeCredentials;
-use Google\Auth\HttpHandler\HttpClientCache;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
-use Prophecy\Argument;
 
 /**
  * @group credentials

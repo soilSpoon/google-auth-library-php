@@ -34,7 +34,7 @@ interface ClientInterface
     public function send(
         RequestInterface $request,
         array $options = []
-    ) : ResponseInterface;
+    ): ResponseInterface;
 
     /**
      * Accepts a PSR-7 request and an array of options and returns a
@@ -48,5 +48,5 @@ interface ClientInterface
     public function sendAsync(
         RequestInterface $request,
         array $options = []
-    ) : PromiseInterface;
+    ): PromiseInterface;
 }

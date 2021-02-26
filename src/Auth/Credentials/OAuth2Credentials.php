@@ -36,6 +36,10 @@ class OAuth2Credentials implements CredentialsInterface
      */
     private $oauth2;
 
+    /**
+     * @param OAuth2 $oauth2
+     * @param array  $options
+     */
     public function __construct(OAuth2 $oauth2, array $options = [])
     {
         $this->setCacheFromOptions($options);

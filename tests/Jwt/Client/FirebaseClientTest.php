@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-namespace Google\Auth\Jwt\Tests;
+namespace Google\Jwt\Client\Tests;
 
 use Firebase\JWT\BeforeValidException;
 use Firebase\JWT\ExpiredException;
@@ -23,15 +23,11 @@ use Firebase\JWT\JWK;
 use Firebase\JWT\JWT;
 use Firebase\JWT\SignatureInvalidException;
 use Google\Auth\GoogleAuth;
-use Google\Auth\Jwt\FirebaseJwtClient;
+use Google\Jwt\Client\FirebaseClient;
 use PHPUnit\Framework\TestCase;
-use Psr\Cache\CacheItemInterface;
-use Psr\Cache\CacheItemPoolInterface;
-use ReflectionClass;
-use Prophecy\Argument;
 use UnexpectedValueException;
 
-class FirebaseJwtClientTest extends TestCase
+class FirebaseClientTest extends TestCase
 {
     /**
      * @dataProvider provideDecode
@@ -58,7 +54,7 @@ class FirebaseJwtClientTest extends TestCase
         $jwt::$payload = $payload;
         $jwt::$expectedException = $expectedException;
 
-        $jwtClient = new FirebaseJwtClient(
+        $jwtClient = new FirebaseClient(
             $jwt,
             $this->prophesize(JWK::class)->reveal()
         );
@@ -122,7 +118,7 @@ class FirebaseJwtClientTest extends TestCase
         $this->expectException('UnexpectedValueException');
 
         $not_a_jwt = 'not a jwt';
-        $jwtClient = new FirebaseJwtClient(new JWT, new JWK);
+        $jwtClient = new FirebaseClient(new JWT, new JWK);
         $jwtClient->decode($not_a_jwt, ['keys' => []], ['algs']);
     }
 
@@ -138,7 +134,7 @@ class FirebaseJwtClientTest extends TestCase
             'exp' => $now + 65, // arbitrary
             'iat' => $now,
         ];
-        $jwtClient = new FirebaseJwtClient(new JWT, new JWK);
+        $jwtClient = new FirebaseClient(new JWT, new JWK);
         $jwt = $jwtClient->encode($jwtPayload, $privateKey, 'RS256', 'kid');
 
         $decoded = $jwtClient->decode($jwt, ['kid' => $publicKey], ['RS256']);

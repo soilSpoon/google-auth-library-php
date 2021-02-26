@@ -19,10 +19,10 @@ declare(strict_types=1);
 
 namespace Google\Auth\Credentials;
 
-use Google\Auth\SignBlob\ServiceAccountApiSignBlobTrait;
-use Google\Auth\SignBlob\PrivateKeySignBlobTrait;
-use Google\Auth\SignBlob\SignBlobInterface;
 use Google\Auth\OAuth2;
+use Google\Auth\SignBlob\PrivateKeySignBlobTrait;
+use Google\Auth\SignBlob\ServiceAccountApiSignBlobTrait;
+use Google\Auth\SignBlob\SignBlobInterface;
 
 /**
  * Authenticates requests using Google's Service Account credentials via
@@ -104,10 +104,14 @@ class ServiceAccountJwtAccessCredentials implements
      * @return array A set of auth related metadata, containing the
      * following keys:
      *   - access_token (string)
+     *   - expires_in (int)
      */
     private function fetchAuthTokenNoCache(): array
     {
-        return ['access_token' => $this->oauth2->toJwt()];
+        return [
+            'access_token' => $this->oauth2->toJwt(),
+            'expires_in' => $this->oauth2->getExpiry(),
+        ];
     }
 
     /**

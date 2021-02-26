@@ -18,18 +18,18 @@
 namespace Google\Auth\Tests;
 
 use Firebase\JWT\JWT;
-use Google\Auth\GoogleAuth;
 use Google\Auth\Credentials\ComputeCredentials;
 use Google\Auth\Credentials\ServiceAccountCredentials;
 use Google\Auth\Credentials\UserRefreshCredentials;
-use Google\Auth\Jwt\JwtClientInterface;
+use Google\Auth\GoogleAuth;
+use Google\Jwt\ClientInterface;
 use GuzzleHttp\Psr7;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use ReflectionClass;
-use Prophecy\Argument;
 use UnexpectedValueException;
 
 /**
@@ -650,7 +650,7 @@ class GoogleAuthTest extends TestCase
         $this->mockCache->save(Argument::type(CacheItemInterface::class))
             ->shouldBeCalledTimes(1);
 
-        $jwt = $this->prophesize(JwtClientInterface::class);
+        $jwt = $this->prophesize(ClientInterface::class);
         $jwt->parseKeySet($certsData)
             ->shouldBeCalledTimes(1)
             ->willReturn($parsedCertsData);
@@ -771,7 +771,7 @@ class GoogleAuthTest extends TestCase
         $this->mockCache->save(Argument::type(CacheItemInterface::class))
             ->shouldBeCalledTimes(1);
 
-        $jwt = $this->prophesize(JwtClientInterface::class);
+        $jwt = $this->prophesize(ClientInterface::class);
         $jwt->parseKeySet($certsData)
             ->shouldBeCalledTimes(1)
             ->willReturn($parsedCertsData);
@@ -826,7 +826,7 @@ class GoogleAuthTest extends TestCase
         string $expectedAlg = 'RS256'
     ) {
         $parsedCertsData = [];
-        $jwtClient = $this->prophesize(JwtClientInterface::class);
+        $jwtClient = $this->prophesize(ClientInterface::class);
         $jwtClient->parseKeySet(Argument::any())
             ->shouldBeCalledTimes(1)
             ->willReturn($parsedCertsData);
@@ -954,7 +954,7 @@ class GoogleAuthTest extends TestCase
         $googleAuth = new GoogleAuth();
 
         $parsedCertsData = [];
-        $jwtClient = $this->prophesize(JwtClientInterface::class);
+        $jwtClient = $this->prophesize(ClientInterface::class);
         $jwtClient->parseKeySet(Argument::any())
             ->shouldBeCalledTimes(1)
             ->willReturn($parsedCertsData);

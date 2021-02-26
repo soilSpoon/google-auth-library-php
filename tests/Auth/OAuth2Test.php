@@ -17,19 +17,18 @@
 
 namespace Google\Auth\Tests;
 
-use Firebase\JWT\JWT;
 use Firebase\JWT\JWK;
-use Google\Auth\Jwt\FirebaseJwtClient;
+use Firebase\JWT\JWT;
 use Google\Auth\Credentials\CredentialsInterface;
-use Google\Auth\GoogleAuth;
 use Google\Auth\OAuth2;
-use GuzzleHttp\Psr7;
-use GuzzleHttp\Psr7\Response;
+use Google\Jwt\Client\FirebaseClient;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
+use GuzzleHttp\Psr7;
+use GuzzleHttp\Psr7\Response;
 use InvalidArgumentException;
-use Psr\Http\Message\RequestInterface;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\RequestInterface;
 use UnexpectedValueException;
 
 class OAuth2Test extends TestCase
@@ -859,7 +858,7 @@ class OAuth2Test extends TestCase
 
     private function jwtDecode(string $jwt, array $keys, array $algs): array
     {
-        $jwtClient = new FirebaseJwtClient(new JWT, new JWK);
+        $jwtClient = new FirebaseClient(new JWT, new JWK);
 
         return $jwtClient->decode($jwt, $keys, $algs);
     }

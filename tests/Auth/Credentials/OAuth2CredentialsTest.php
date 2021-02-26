@@ -19,8 +19,8 @@ namespace Google\Auth\Credentials\Tests;
 
 use Google\Auth\Credentials\OAuth2Credentials;
 use Google\Auth\OAuth2;
-use PHPUnit\Framework\TestCase;
 use LogicException;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @group credentials

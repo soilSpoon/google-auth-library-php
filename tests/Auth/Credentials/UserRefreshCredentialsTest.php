@@ -17,15 +17,14 @@
 
 namespace Google\Auth\Credentials\Tests;
 
-use Google\Auth\ApplicationDefaultCredentials;
 use Google\Auth\Credentials\UserRefreshCredentials;
 use Google\Auth\OAuth2;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Psr7\Response;
-use PHPUnit\Framework\TestCase;
 use InvalidArgumentException;
 use LogicException;
+use PHPUnit\Framework\TestCase;
 
 class UserRefreshCredentialsTest extends TestCase
 {

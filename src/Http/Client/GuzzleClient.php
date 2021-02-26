@@ -19,9 +19,9 @@ declare(strict_types=1);
 
 namespace Google\Http\Client;
 
+use Google\Http\ClientInterface as GoogleClientInterface;
 use Google\Http\Promise\GuzzlePromise;
 use Google\Http\PromiseInterface;
-use Google\Http\ClientInterface as GoogleClientInterface;
 use GuzzleHttp\ClientInterface as GuzzleClientInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
