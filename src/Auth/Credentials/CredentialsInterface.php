@@ -45,14 +45,14 @@ interface CredentialsInterface
     /**
      * Get the project ID.
      *
-     * @return string|null
+     * @return null|string
      */
     public function getProjectId(): ?string;
 
     /**
-     * Get the quota project used for this API request
+     * Get the quota project used for this API request.
      *
-     * @return string|null
+     * @return null|string
      */
     public function getQuotaProject(): ?string;
 }

@@ -31,8 +31,10 @@ trait PrivateKeySignBlobTrait
      *
      * @param string $stringToSign
      * @param string $privateKey
-     * @return string
+     *
      * @throws \RuntimeException
+     *
+     * @return string
      */
     private function signBlobWithPrivateKey(
         string $stringToSign,

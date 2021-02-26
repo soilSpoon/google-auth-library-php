@@ -19,11 +19,10 @@ declare(strict_types=1);
 
 namespace Google\Auth;
 
-use Firebase\JWT\JWK;
-use Firebase\JWT\JWT;
-use Google\Auth\Http\ClientFactory;
-use Google\Jwt\Client\FirebaseClient;
-use Google\Jwt\ClientInterface;
+use Google\Auth\Http\ClientFactory as HttpClientFactory;
+use Google\Auth\Jwt\ClientFactory as JwtClientFactory;
+use Google\Http\ClientInterface as HttpClientInterface;
+use Google\Jwt\ClientInterface as JwtClientInterface;
 use GuzzleHttp\Psr7;
 use GuzzleHttp\Psr7\Request;
 use InvalidArgumentException;
@@ -182,7 +181,7 @@ class OAuth2
     private $signingKey;
 
     /**
-     * The signing key id when using assertion profile. Param kid in jwt header
+     * The signing key id when using assertion profile. Param kid in jwt header.
      *
      * @var string
      */
@@ -259,12 +258,12 @@ class OAuth2
     private $additionalClaims;
 
     /**
-     * @var ClientInterface
+     * @var HttpClientInterface
      */
     private $httpClient;
 
     /**
-     * @var ClientInterface
+     * @var JwtClientInterface
      */
     private $jwtClient;
 
@@ -378,9 +377,8 @@ class OAuth2
             }
         }
 
-        $this->httpClient = $opts['httpClient'] ?: ClientFactory::build();
-        $this->jwtClient = $opts['jwtClient']
-            ?: new FirebaseClient(new JWT(), new JWK());
+        $this->httpClient = $opts['httpClient'] ?: HttpClientFactory::build();
+        $this->jwtClient = $opts['jwtClient'] ?: JwtClientFactory::build();
         $this->setAuthorizationUri($opts['authorizationUri']);
         $this->setRedirectUri($opts['redirectUri']);
         $this->setTokenCredentialUri($opts['tokenCredentialUri']);
@@ -407,6 +405,7 @@ class OAuth2
      * Obtains the encoded jwt from the instance data.
      *
      * @param array $config array optional configuration parameters
+     *
      * @return string
      */
     public function toJwt(array $config = [])
@@ -469,7 +468,7 @@ class OAuth2
     /**
      * Generates a request for token credentials.
      *
-     * @return RequestInterface the authorization Url.
+     * @return RequestInterface the authorization Url
      */
     public function generateCredentialsRequest(): RequestInterface
     {
@@ -480,28 +479,37 @@ class OAuth2
 
         $grantType = $this->getGrantType();
         $params = ['grant_type' => $grantType];
+
         switch ($grantType) {
             case 'authorization_code':
                 $params['code'] = $this->getCode();
                 $params['redirect_uri'] = $this->getRedirectUri();
                 $this->addClientCredentials($params);
+
                 break;
+
             case 'password':
                 $params['username'] = $this->getUsername();
                 $params['password'] = $this->getPassword();
                 $this->addClientCredentials($params);
+
                 break;
+
             case 'refresh_token':
                 $params['refresh_token'] = $this->getRefreshToken();
                 $this->addClientCredentials($params);
+
                 break;
+
             case self::JWT_URN:
                 $params['assertion'] = $this->toJwt();
+
                 break;
+
             default:
                 if (!is_null($this->getRedirectUri())) {
-                    # Grant type was supposed to be 'authorization_code', as there
-                    # is a redirect URI.
+                    // Grant type was supposed to be 'authorization_code', as there
+                    // is a redirect URI.
                     throw new \DomainException('Missing authorization code');
                 }
                 unset($params['grant_type']);
@@ -529,7 +537,7 @@ class OAuth2
      *
      * The key is derived from the scopes.
      *
-     * @return string a key that may be used to cache the auth token.
+     * @return string a key that may be used to cache the auth token
      */
     public function getCacheKey(): ?string
     {
@@ -546,33 +554,6 @@ class OAuth2
     }
 
     /**
-     * Parses the fetched tokens.
-     *
-     * @param ResponseInterface $resp the response.
-     * @return array the tokens parsed from the response body.
-     * @throws \Exception
-     */
-    private function parseTokenResponse(ResponseInterface $resp)
-    {
-        $body = (string)$resp->getBody();
-        if ($resp->hasHeader('Content-Type') &&
-            $resp->getHeaderLine('Content-Type') == 'application/x-www-form-urlencoded'
-        ) {
-            $res = [];
-            parse_str($body, $res);
-
-            return $res;
-        }
-
-        // Assume it's JSON; if it's not throw an exception
-        if (null === $res = json_decode($body, true)) {
-            throw new \Exception('Invalid JSON response');
-        }
-
-        return $res;
-    }
-
-    /**
      * Sets properties of the OAuth2 token, usually after loading from cache.
      *
      * Example:
@@ -585,7 +566,7 @@ class OAuth2
      * ```
      *
      * @param array $authToken
-     *  The configuration parameters related to the token.
+     *                         The configuration parameters related to the token.
      *
      *  - refresh_token
      *    The refresh token associated with the access token
@@ -641,8 +622,9 @@ class OAuth2
      * Revoke an OAuth2 access token or refresh token. This method will revoke the current access
      * token, if a token isn't provided.
      *
-     * @param string $token The token (access token or a refresh token) that should be revoked.
-     * @return bool Returns True if the revocation was successful, otherwise False.
+     * @param string $token the token (access token or a refresh token) that should be revoked
+     *
+     * @return bool returns True if the revocation was successful, otherwise False
      */
     public function revoke(string $token): bool
     {
@@ -655,20 +637,22 @@ class OAuth2
         $body = Psr7\stream_for(http_build_query(['token' => $token]));
         $request = new Request('POST', $this->tokenRevokeUri, [
             'Cache-Control' => 'no-store',
-            'Content-Type'  => 'application/x-www-form-urlencoded',
+            'Content-Type' => 'application/x-www-form-urlencoded',
         ], $body);
 
         $response = $this->httpClient->send($request);
 
-        return $response->getStatusCode() == 200;
+        return 200 == $response->getStatusCode();
     }
 
     /**
      * Builds the authorization Uri that the user should be redirected to.
      *
      * @param array $config configuration options that customize the return url
-     * @return UriInterface the authorization Url.
+     *
      * @throws InvalidArgumentException
+     *
+     * @return UriInterface the authorization Url
      */
     public function buildFullAuthorizationUri(array $config = [])
     {
@@ -710,7 +694,7 @@ class OAuth2
             Psr7\build_query(array_merge($existingParams, $params))
         );
 
-        if ($result->getScheme() != 'https') {
+        if ('https' != $result->getScheme()) {
             throw new InvalidArgumentException(
                 'Authorization endpoint must be protected by TLS'
             );
@@ -819,13 +803,13 @@ class OAuth2
         if (!$this->isAbsoluteUri($uri)) {
             // "postmessage" is a reserved URI string in Google-land
             // @see https://developers.google.com/identity/sign-in/web/server-side-flow
-            if ('postmessage' !== (string)$uri) {
+            if ('postmessage' !== (string) $uri) {
                 throw new InvalidArgumentException(
                     'Redirect URI must be absolute'
                 );
             }
         }
-        $this->redirectUri = (string)$uri;
+        $this->redirectUri = (string) $uri;
     }
 
     /**
@@ -846,7 +830,8 @@ class OAuth2
      * Sets the scope of the access request, expressed either as an Array or as
      * a space-delimited String.
      *
-     * @param string|array $scope
+     * @param array|string $scope
+     *
      * @throws InvalidArgumentException
      */
     public function setScope($scope): void
@@ -858,7 +843,7 @@ class OAuth2
         } elseif (is_array($scope)) {
             foreach ($scope as $s) {
                 $pos = strpos($s, ' ');
-                if ($pos !== false) {
+                if (false !== $pos) {
                     throw new InvalidArgumentException(
                         'array scope values should not contain spaces'
                     );
@@ -908,6 +893,7 @@ class OAuth2
      * Sets the current grant type.
      *
      * @param $grantType
+     *
      * @throws InvalidArgumentException
      */
     public function setGrantType($grantType): void
@@ -921,7 +907,7 @@ class OAuth2
                     'invalid grant type'
                 );
             }
-            $this->grantType = (string)$grantType;
+            $this->grantType = (string) $grantType;
         }
     }
 
@@ -1215,14 +1201,14 @@ class OAuth2
             $this->issuedAt = null;
         } else {
             $this->issuedAt = time();
-            $this->expiresIn = (int)$expiresIn;
+            $this->expiresIn = (int) $expiresIn;
         }
     }
 
     /**
      * Gets the time the current access token expires at.
      *
-     * @return int|null
+     * @return null|int
      */
     public function getExpiresAt(): ?int
     {
@@ -1263,7 +1249,7 @@ class OAuth2
     /**
      * Gets the time the current access token was issued at.
      *
-     * @return int|null
+     * @return null|int
      */
     public function getIssuedAt(): ?int
     {
@@ -1283,7 +1269,7 @@ class OAuth2
     /**
      * Gets the current access token.
      *
-     * @return string|null
+     * @return null|string
      */
     public function getAccessToken(): ?string
     {
@@ -1293,7 +1279,7 @@ class OAuth2
     /**
      * Sets the current access token.
      *
-     * @param string|null $accessToken
+     * @param null|string $accessToken
      */
     public function setAccessToken(string $accessToken = null): void
     {
@@ -1303,7 +1289,7 @@ class OAuth2
     /**
      * Gets the current ID token.
      *
-     * @return string|null
+     * @return null|string
      */
     public function getIdToken(): ?string
     {
@@ -1313,7 +1299,7 @@ class OAuth2
     /**
      * Sets the current ID token.
      *
-     * @param string|null $idToken
+     * @param null|string $idToken
      */
     public function setIdToken(string $idToken = null): void
     {
@@ -1323,7 +1309,7 @@ class OAuth2
     /**
      * Gets the refresh token associated with the current access token.
      *
-     * @return string|null
+     * @return null|string
      */
     public function getRefreshToken(): ?string
     {
@@ -1333,7 +1319,7 @@ class OAuth2
     /**
      * Sets the refresh token associated with the current access token.
      *
-     * @param string|null $refreshToken
+     * @param null|string $refreshToken
      */
     public function setRefreshToken(?string $refreshToken): void
     {
@@ -1351,7 +1337,7 @@ class OAuth2
     }
 
     /**
-     * Sets additional claims to be included in the JWT token
+     * Sets additional claims to be included in the JWT token.
      *
      * @param array $additionalClaims
      */
@@ -1361,7 +1347,37 @@ class OAuth2
     }
 
     /**
+     * Parses the fetched tokens.
+     *
+     * @param ResponseInterface $resp the response
+     *
+     * @throws \Exception
+     *
+     * @return array the tokens parsed from the response body
+     */
+    private function parseTokenResponse(ResponseInterface $resp)
+    {
+        $body = (string) $resp->getBody();
+        if ($resp->hasHeader('Content-Type')
+            && 'application/x-www-form-urlencoded' == $resp->getHeaderLine('Content-Type')
+        ) {
+            $res = [];
+            parse_str($body, $res);
+
+            return $res;
+        }
+
+        // Assume it's JSON; if it's not throw an exception
+        if (null === $res = json_decode($body, true)) {
+            throw new \Exception('Invalid JSON response');
+        }
+
+        return $res;
+    }
+
+    /**
      * @param string $uri
+     *
      * @return null|UriInterface
      */
     private function coerceUri(?string $uri): ?UriInterface
@@ -1378,6 +1394,7 @@ class OAuth2
      * (RFC 3986).
      *
      * @param string $uri
+     *
      * @return bool
      */
     private function isAbsoluteUri(string $uri): bool

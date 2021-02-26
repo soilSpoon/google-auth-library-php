@@ -29,6 +29,10 @@ use Prophecy\Argument;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 
+/**
+ * @internal
+ * @coversNothing
+ */
 class CredentialsTest extends TestCase
 {
     private $serviceAccountCreds = [
@@ -78,7 +82,7 @@ class CredentialsTest extends TestCase
                 ServiceAccountJwtAccessCredentials::class,
                 $this->serviceAccountCreds,
                 ['audience' => 'foo'],
-                'http://authuri/'
+                'http://authuri/',
             ],
             [UserRefreshCredentials::class, $this->userRefreshCreds],
         ];
@@ -86,6 +90,8 @@ class CredentialsTest extends TestCase
 
     /**
      * @dataProvider provideAccessTokenCredentials
+     *
+     * @param null|mixed $firstArgument
      */
     public function testUsesCachedAccessToken(
         string $credentialsClass,
@@ -96,14 +102,17 @@ class CredentialsTest extends TestCase
         $mockCacheItem = $this->prophesize(CacheItemInterface::class);
         $mockCacheItem->isHit()
             ->shouldBeCalledTimes(1)
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
         $mockCacheItem->get()
             ->shouldBeCalledTimes(1)
-            ->willReturn($cachedValue);
+            ->willReturn($cachedValue)
+        ;
         $mockCache = $this->prophesize(CacheItemPoolInterface::class);
         $mockCache->getItem(Argument::type('string'))
             ->shouldBeCalledTimes(1)
-            ->willReturn($mockCacheItem->reveal());
+            ->willReturn($mockCacheItem->reveal())
+        ;
 
         $options['cache'] = $mockCache->reveal();
 
@@ -120,6 +129,8 @@ class CredentialsTest extends TestCase
 
     /**
      * @dataProvider provideIdTokenCredentials
+     *
+     * @param null|mixed $firstArgument
      */
     public function testUsesCachedIdToken(
         string $credentialsClass,
@@ -133,17 +144,21 @@ class CredentialsTest extends TestCase
         $mockCacheItem = $this->prophesize(CacheItemInterface::class);
         $mockCacheItem->isHit()
             ->shouldBeCalledTimes(1)
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
         $mockCacheItem->get()
             ->shouldBeCalledTimes(1)
-            ->willReturn($cachedValue);
+            ->willReturn($cachedValue)
+        ;
         $mockCache = $this->prophesize(CacheItemPoolInterface::class);
         $mockCache->getItem(Argument::type('string'))
             ->shouldBeCalledTimes(1)
             ->will(function ($args) use (&$cacheKey, $mockCacheItem) {
                 $cacheKey = $args[0]; // save the cache key
+
                 return $mockCacheItem->reveal();
-            });
+            })
+        ;
 
         $options['cache'] = $mockCache->reveal();
 
@@ -159,18 +174,22 @@ class CredentialsTest extends TestCase
         $mockCacheItem = $this->prophesize(CacheItemInterface::class);
         $mockCacheItem->isHit()
             ->shouldBeCalledTimes(1)
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
         $mockCacheItem->get()
             ->shouldBeCalledTimes(1)
-            ->willReturn($cachedValue);
+            ->willReturn($cachedValue)
+        ;
         $mockCache = $this->prophesize(CacheItemPoolInterface::class);
         $mockCache->getItem(Argument::type('string'))
             ->shouldBeCalledTimes(1)
             ->will(function ($args) use ($phpunit, $cacheKey, $mockCacheItem) {
                 // Assert the cache key is different for ID tokens
                 $phpunit->assertNotEquals($cacheKey, $args[0]);
+
                 return $mockCacheItem->reveal();
-            });
+            })
+        ;
 
         $targetAudience = 'a-target-audience';
         $options['targetAudience'] = $targetAudience;
@@ -187,6 +206,8 @@ class CredentialsTest extends TestCase
 
     /**
      * @dataProvider provideGetRequestMetadataCredentials
+     *
+     * @param null|mixed $firstArgument
      */
     public function testGetRequestMetadataWithCache(
         string $credentialsClass,
@@ -199,14 +220,17 @@ class CredentialsTest extends TestCase
         $mockCacheItem = $this->prophesize(CacheItemInterface::class);
         $mockCacheItem->isHit()
             ->shouldBeCalledTimes(1)
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
         $mockCacheItem->get()
             ->shouldBeCalledTimes(1)
-            ->willReturn($cachedValue);
+            ->willReturn($cachedValue)
+        ;
         $mockCache = $this->prophesize(CacheItemPoolInterface::class);
         $mockCache->getItem(Argument::type('string'))
             ->shouldBeCalledTimes(1)
-            ->willReturn($mockCacheItem->reveal());
+            ->willReturn($mockCacheItem->reveal())
+        ;
 
         $options['cache'] = $mockCache->reveal();
 
@@ -219,11 +243,13 @@ class CredentialsTest extends TestCase
         $metadata = $credentials->getRequestMetadata($authUri);
 
         $this->assertArrayHasKey('Authorization', $metadata);
-        $this->assertEquals("Bearer $token", $metadata['Authorization']);
+        $this->assertEquals("Bearer {$token}", $metadata['Authorization']);
     }
 
     /**
      * @dataProvider provideAccessTokenCredentials
+     *
+     * @param null|mixed $firstArgument
      */
     public function testShouldReturnValueWhenNotExpired(
         string $credentialsClass,
@@ -239,14 +265,17 @@ class CredentialsTest extends TestCase
         $mockCacheItem = $this->prophesize(CacheItemInterface::class);
         $mockCacheItem->isHit()
             ->shouldBeCalledTimes(1)
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
         $mockCacheItem->get()
             ->shouldBeCalledTimes(1)
-            ->willReturn($cachedValue);
+            ->willReturn($cachedValue)
+        ;
         $mockCache = $this->prophesize(CacheItemPoolInterface::class);
         $mockCache->getItem(Argument::type('string'))
             ->shouldBeCalledTimes(1)
-            ->willReturn($mockCacheItem->reveal());
+            ->willReturn($mockCacheItem->reveal())
+        ;
 
         // Run the test.
         $options['cache'] = $mockCache->reveal();
@@ -259,12 +288,14 @@ class CredentialsTest extends TestCase
         $accessToken = $credentials->fetchAuthToken();
         $this->assertEquals($accessToken, [
             'access_token' => $token,
-            'expires_at' => $expiresAt
+            'expires_at' => $expiresAt,
         ]);
     }
 
     /**
      * @dataProvider provideAccessTokenCredentials
+     *
+     * @param null|mixed $firstArgument
      */
     public function testShouldSaveValueInCacheWithCachePrefix(
         string $credentialsClass,
@@ -280,18 +311,22 @@ class CredentialsTest extends TestCase
         $mockCacheItem = $this->prophesize(CacheItemInterface::class);
         $mockCacheItem->isHit()
             ->shouldBeCalledTimes(1)
-            ->willReturn(true);
+            ->willReturn(true)
+        ;
         $mockCacheItem->get()
             ->shouldBeCalledTimes(1)
-            ->willReturn($cachedValue);
+            ->willReturn($cachedValue)
+        ;
         $mockCache = $this->prophesize(CacheItemPoolInterface::class);
         $mockCache->getItem(Argument::type('string'))
             ->shouldBeCalledTimes(1)
             ->will(function ($args) use ($phpunit, $prefix, $mockCacheItem) {
                 $cacheKey = $args[0];
                 $phpunit->assertStringStartsWith($prefix, $cacheKey);
+
                 return $mockCacheItem->reveal();
-            });
+            })
+        ;
 
         // Run the test.
         $options['cache'] = $mockCache->reveal();

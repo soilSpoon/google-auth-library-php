@@ -76,29 +76,28 @@ class ServiceAccountCredentials implements
     private $oauth2;
 
     /**
-     * The quota project associated with the JSON credentials
+     * The quota project associated with the JSON credentials.
      *
      * @var string
      */
     private $quotaProject;
 
-    /*
-     * @var string|null
-     */
+    // @var string|null
     private $projectId;
 
     /**
      * Create a new ServiceAccountCredentials.
      *
-     * @param string|array $jsonKey JSON credential file path or JSON
-     *      credentials in associative array
-     * @param array $options {
-     *      @type string|array $scope the scope of the access request, expressed
+     * @param array|string $jsonKey JSON credential file path or JSON
+     *                              credentials in associative array
+     * @param array        $options {
+     *
+     *      @var array|string $scope the scope of the access request, expressed
      *          as an array or as a space-delimited string.
-     *      @type string $subject an email address account to impersonate, in
+     *      @var string $subject an email address account to impersonate, in
      *          situations when the service account has been delegated domain
      *          wide access.
-     *      @type string $targetAudience The audience for the ID token.
+     *      @var string $targetAudience The audience for the ID token.
      * }
      */
     public function __construct($jsonKey, array $options = [])
@@ -129,7 +128,7 @@ class ServiceAccountCredentials implements
         $additionalClaims = [];
         if ($options['targetAudience']) {
             $additionalClaims = [
-                'target_audience' => $options['targetAudience']
+                'target_audience' => $options['targetAudience'],
             ];
         }
         $this->setHttpClientFromOptions($options);
@@ -153,22 +152,11 @@ class ServiceAccountCredentials implements
     }
 
     /**
-     * @return array Auth related metadata, with the following keys:
-     *     - access_token (string)
-     *     - expires_in (int)
-     *     - token_type (string)
-     */
-    private function fetchAuthTokenNoCache(): array
-    {
-        return $this->oauth2->fetchAuthToken();
-    }
-
-    /**
      * Get the project ID from the service account keyfile.
      *
      * Returns null if the project ID does not exist in the keyfile.
      *
-     * @return string|null
+     * @return null|string
      */
     public function getProjectId(): ?string
     {
@@ -188,10 +176,10 @@ class ServiceAccountCredentials implements
         }
 
         // no scope found. create jwt with the auth uri
-        $credJson = array(
+        $credJson = [
             'private_key' => $this->oauth2->getSigningKey(),
             'client_email' => $this->oauth2->getIssuer(),
-        );
+        ];
 
         $options = [
             'httpClient' => $this->httpClient,
@@ -209,7 +197,8 @@ class ServiceAccountCredentials implements
      * Sign a string using the method which is best for a given credentials type.
      * If OpenSSL is not installed, uses the Service Account Credentials API.
      *
-     * @param string $stringToSign The string to sign.
+     * @param string $stringToSign the string to sign
+     *
      * @return string The resulting signature. Value should be base64-encoded.
      */
     public function signBlob(string $stringToSign): string
@@ -223,6 +212,7 @@ class ServiceAccountCredentials implements
         }
 
         $accessToken = $this->fetchAuthToken()['access_token'];
+
         return $this->signBlobWithServiceAccountApi(
             $this->httpClient,
             $this->getClientEmail(),
@@ -243,6 +233,27 @@ class ServiceAccountCredentials implements
         return $this->oauth2->getIssuer();
     }
 
+    /**
+     * Get the quota project used for this API request.
+     *
+     * @return null|string
+     */
+    public function getQuotaProject(): ?string
+    {
+        return $this->quotaProject;
+    }
+
+    /**
+     * @return array Auth related metadata, with the following keys:
+     *               - access_token (string)
+     *               - expires_in (int)
+     *               - token_type (string)
+     */
+    private function fetchAuthTokenNoCache(): array
+    {
+        return $this->oauth2->fetchAuthToken();
+    }
+
     private function getCacheKey(): string
     {
         $key = $this->oauth2->getIssuer() . ':' . $this->oauth2->getCacheKey();
@@ -261,15 +272,5 @@ class ServiceAccountCredentials implements
     private function useSelfSignedJwt()
     {
         return is_null($this->oauth2->getScope());
-    }
-
-    /**
-     * Get the quota project used for this API request
-     *
-     * @return string|null
-     */
-    public function getQuotaProject(): ?string
-    {
-        return $this->quotaProject;
     }
 }

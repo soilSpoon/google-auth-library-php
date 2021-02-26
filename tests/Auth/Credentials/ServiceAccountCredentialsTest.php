@@ -26,6 +26,10 @@ use InvalidArgumentException;
 use LogicException;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @internal
+ * @coversNothing
+ */
 class ServiceAccountCredentialsTest extends TestCase
 {
     private static $privateKey;
@@ -35,7 +39,7 @@ class ServiceAccountCredentialsTest extends TestCase
         'client_email' => 'test@example.com',
         'client_id' => 'client123',
         'type' => 'service_account',
-        'project_id' => 'example_project'
+        'project_id' => 'example_project',
     ];
 
     public static function setUpBeforeClass(): void
@@ -49,7 +53,7 @@ class ServiceAccountCredentialsTest extends TestCase
     {
         $scope = ['scope/1', 'scope/2'];
         $credentials = new ServiceAccountCredentials($this->testJson, [
-            'scope' => $scope
+            'scope' => $scope,
         ]);
 
         $reflection = new \ReflectionClass($credentials);
@@ -70,7 +74,7 @@ class ServiceAccountCredentialsTest extends TestCase
         $sub = 'sub123';
         $credentials = new ServiceAccountCredentials($this->testJson, [
             'scope' => $scope,
-            'subject' => $sub
+            'subject' => $sub,
         ]);
 
         $reflection = new \ReflectionClass($credentials);
@@ -130,7 +134,7 @@ class ServiceAccountCredentialsTest extends TestCase
     {
         $keyFile = __DIR__ . '/../fixtures' . '/private.json';
         $credentials = new ServiceAccountCredentials($keyFile, [
-            'scope' => 'scope/1'
+            'scope' => 'scope/1',
         ]);
         $this->assertNotNull($credentials);
     }
@@ -146,7 +150,7 @@ class ServiceAccountCredentialsTest extends TestCase
 
         try {
             new ServiceAccountCredentials($path, [
-                'scope' => 'scope/1'
+                'scope' => 'scope/1',
             ]);
         } finally {
             fclose($tmp);
@@ -163,7 +167,7 @@ class ServiceAccountCredentialsTest extends TestCase
         ]);
         $credentials = new ServiceAccountCredentials($this->testJson, [
             'scope' => $scope,
-            'httpClient' => $httpClient
+            'httpClient' => $httpClient,
         ]);
         $credentials->fetchAuthToken();
     }
@@ -178,7 +182,7 @@ class ServiceAccountCredentialsTest extends TestCase
         ]);
         $credentials = new ServiceAccountCredentials($this->testJson, [
             'scope' => $scope,
-            'httpClient' => $httpClient
+            'httpClient' => $httpClient,
         ]);
         $credentials->fetchAuthToken();
     }
@@ -192,7 +196,7 @@ class ServiceAccountCredentialsTest extends TestCase
         ]);
         $credentials = new ServiceAccountCredentials($this->testJson, [
             'scope' => ['scope/1', 'scope/2'],
-            'httpClient' => $httpClient
+            'httpClient' => $httpClient,
         ]);
         $tokens = $credentials->fetchAuthToken();
         $this->assertEquals($this->testJson, $tokens);
@@ -203,13 +207,13 @@ class ServiceAccountCredentialsTest extends TestCase
         $this->testJson['private_key'] = self::$privateKey;
         $scope = ['scope/1', 'scope/2'];
         $access_token = 'accessToken123';
-        $responseText = json_encode(array('access_token' => $access_token));
+        $responseText = json_encode(['access_token' => $access_token]);
         $httpClient = httpClientWithResponses([
             new Response(200, [], $responseText),
         ]);
         $credentials = new ServiceAccountCredentials($this->testJson, [
             'scope' => $scope,
-            'httpClient' => $httpClient
+            'httpClient' => $httpClient,
         ]);
         $metadata = $credentials->getRequestMetadata();
         $this->assertIsArray($metadata);
@@ -228,7 +232,7 @@ class ServiceAccountCredentialsTest extends TestCase
         $timesCalled = 0;
         $httpClient = httpClientFromCallable(
             function ($request) use (&$timesCalled, $expectedToken) {
-                $timesCalled++;
+                ++$timesCalled;
                 parse_str($request->getBody(), $post);
                 $this->assertArrayHasKey('assertion', $post);
                 list($header, $payload, $sig) = explode('.', $post['assertion']);
@@ -262,7 +266,7 @@ class ServiceAccountCredentialsTest extends TestCase
     public function testReturnsClientEmail()
     {
         $credentials = new ServiceAccountCredentials($this->testJson, [
-            'scope' => 'scope/1'
+            'scope' => 'scope/1',
         ]);
         $this->assertEquals(
             $this->testJson['client_email'],
@@ -273,7 +277,7 @@ class ServiceAccountCredentialsTest extends TestCase
     public function testGetProjectId()
     {
         $credentials = new ServiceAccountCredentials($this->testJson, [
-            'scope' => 'scope/1'
+            'scope' => 'scope/1',
         ]);
         $this->assertEquals(
             $this->testJson['project_id'],
@@ -285,13 +289,14 @@ class ServiceAccountCredentialsTest extends TestCase
     {
         $keyFile = __DIR__ . '/../fixtures' . '/private.json';
         $credentials = new ServiceAccountCredentials($keyFile, [
-            'scope' => 'scope/1'
+            'scope' => 'scope/1',
         ]);
         $this->assertEquals(
             'test_quota_project',
             $credentials->getQuotaProject()
         );
     }
+
     public function testNoScopeUsesJwtAccess()
     {
         $this->testJson['private_key'] = self::$privateKey;

@@ -19,32 +19,25 @@ declare(strict_types=1);
 
 namespace Google\Auth;
 
-use Google\Auth\SignBlob\ServiceAccountApiSignBlobTrait;
-use Google\Auth\SignBlob\SignBlobInterface;
 use Google\Http\ClientInterface;
 use GuzzleHttp\Psr7\Request;
 use Psr\Http\Client\ClientExceptionInterface;
 
 /**
- * ComputeCredentials supports authorization on Google Compute Engine.
- *
- * It can be used to authorize requests using the AuthTokenMiddleware, but will
- * only succeed if being run on GCE:
+ * Compute supports calling the metadata server on Compute Engine.
  *
  *   use Google\Auth\Credentials\ComputeCredentials;
  *   use Google\Auth\Http\CredentialsClient;
  *   use Psr\Http\Message\Request;
  *
- *   $gce = new ComputeCredentials();
+ *   $gce = new Compute();
  *   $http = new CredentialsClient($gce);
  *
  *   $url = 'https://www.googleapis.com/taskqueue/v1beta2/projects';
  *   $res = $http->send(new Request('GET', $url));
  */
-class Compute implements SignBlobInterface
+final class Compute
 {
-    use ServiceAccountApiSignBlobTrait;
-
     /**
      * The metadata IP address on appengine instances.
      *
@@ -67,8 +60,9 @@ class Compute implements SignBlobInterface
     public static function onAppEngineFlexible(): bool
     {
         if ($gaeInstance = getenv('GAE_INSTANCE')) {
-            return substr($gaeInstance, 0, 4) === 'aef-';
+            return 'aef-' === substr($gaeInstance, 0, 4);
         }
+
         return false;
     }
 
@@ -77,6 +71,7 @@ class Compute implements SignBlobInterface
      * host.
      *
      * @param ClientInterface $httpClient
+     *
      * @return bool
      */
     public static function onCompute(ClientInterface $httpClient): bool
@@ -94,7 +89,7 @@ class Compute implements SignBlobInterface
         $maxComputePingTries = 3;
         $computePingConnectionTimeoutSeconds = 0.5;
         $checkUri = 'http://' . self::METADATA_IP;
-        for ($i = 1; $i <= $maxComputePingTries; $i++) {
+        for ($i = 1; $i <= $maxComputePingTries; ++$i) {
             try {
                 // Comment from: oauth2client/client.py
                 //
@@ -113,24 +108,29 @@ class Compute implements SignBlobInterface
                     ['timeout' => $computePingConnectionTimeoutSeconds]
                 );
 
-                return $resp->getHeaderLine(self::FLAVOR_HEADER) == 'Google';
+                return 'Google' == $resp->getHeaderLine(self::FLAVOR_HEADER);
             } catch (ClientExceptionInterface $e) {
             }
         }
+
         return false;
     }
 
     /**
      * Fetch the value of a GCE metadata server URI.
      *
-     * @param string $uriPath The metadata URI path.
+     * @param string          $uriPath    the metadata URI path
+     * @param ClientInterface $httpClient
+     *
      * @return string
      */
-    public function getFromMetadata(string $uriPath): string
-    {
+    public static function getFromMetadata(
+        string $uriPath,
+        ClientInterface $httpClient
+    ): string {
         $uri = 'http://' . self::METADATA_IP . $uriPath;
 
-        $resp = $this->httpClient->send(
+        $resp = $httpClient->send(
             new Request(
                 'GET',
                 $uri,

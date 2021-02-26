@@ -25,7 +25,7 @@ interface ClientInterface
      * @param array       $payload
      * @param string      $signingKey
      * @param string      $signingAlg
-     * @param string|null $keyId
+     * @param null|string $keyId
      *
      * @return array
      */
@@ -58,7 +58,7 @@ interface ClientInterface
      *
      * @param string $jwt
      *
-     * @return string|null
+     * @return null|string
      */
     public function getExpirationWithoutVerification(string $jwt): ?int;
 }

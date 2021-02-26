@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright 2020 Google LLC
+ * Copyright 2020 Google LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ interface ClientInterface
      * response.
      *
      * @param \Psr\Http\Message\RequestInterface $request
-     * @param array $options [optional]
+     * @param array                              $options [optional]
      *
      * @return \Psr\Http\Message\ResponseInterface
      */
@@ -41,7 +41,7 @@ interface ClientInterface
      * PromiseInterface.
      *
      * @param \Psr\Http\Message\RequestInterface $request
-     * @param array $options [optional]
+     * @param array                              $options [optional]
      *
      * @return \Google\Http\Promise\PromiseInterface
      */

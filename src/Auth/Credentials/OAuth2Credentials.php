@@ -48,6 +48,30 @@ class OAuth2Credentials implements CredentialsInterface
     }
 
     /**
+     * Get the project ID.
+     *
+     * @return null|string
+     */
+    public function getProjectId(): ?string
+    {
+        throw new LogicException(
+            'getProjectId is not implemented for OAuth2 credentials'
+        );
+    }
+
+    /**
+     * Get the quota project used for this API request.
+     *
+     * @return null|string
+     */
+    public function getQuotaProject(): ?string
+    {
+        throw new LogicException(
+            'getQuotaProject is not implemented for OAuth2 credentials'
+        );
+    }
+
+    /**
      * Fetches the auth tokens based on the current state.
      *
      * @return array a hash of auth tokens
@@ -58,35 +82,11 @@ class OAuth2Credentials implements CredentialsInterface
     }
 
     /**
-     * Get the project ID.
-     *
-     * @return string|null
-     */
-    public function getProjectId(): ?string
-    {
-        throw new LogicException(
-            'getProjectId is not implemented for OAuth2 credentials'
-        );
-    }
-
-    /**
-     * Get the quota project used for this API request
-     *
-     * @return string|null
-     */
-    public function getQuotaProject(): ?string
-    {
-        throw new LogicException(
-            'getQuotaProject is not implemented for OAuth2 credentials'
-        );
-    }
-
-    /**
      * Obtains a key that can used to cache the results of #fetchAuthToken.
      *
      * The key is derived from the scopes.
      *
-     * @return string a key that may be used to cache the auth token.
+     * @return string a key that may be used to cache the auth token
      */
     private function getCacheKey(): string
     {

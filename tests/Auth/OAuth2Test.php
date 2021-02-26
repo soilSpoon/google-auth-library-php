@@ -31,6 +31,10 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use UnexpectedValueException;
 
+/**
+ * @internal
+ * @coversNothing
+ */
 class OAuth2Test extends TestCase
 {
     private $privateKey;
@@ -198,7 +202,7 @@ class OAuth2Test extends TestCase
         ]);
         $this->assertEquals('postmessage', $o->getRedirectUri());
         $url = $o->buildFullAuthorizationUri();
-        $parts = parse_url((string)$url);
+        $parts = parse_url((string) $url);
         parse_str($parts['query'], $query);
         $this->assertArrayHasKey('redirect_uri', $query);
         $this->assertEquals('postmessage', $query['redirect_uri']);
@@ -399,8 +403,6 @@ class OAuth2Test extends TestCase
         $o->toJwt();
     }
 
-    /**
-     */
     public function testCanHaveNoScope()
     {
         $testConfig = $this->signingMinimal;
@@ -432,7 +434,7 @@ class OAuth2Test extends TestCase
         $testConfig = $this->signingMinimal;
         $keys = [
             'example_key_id1' => 'example_key1',
-            'example_key_id2' => 'example_key2'
+            'example_key_id2' => 'example_key2',
         ];
         $testConfig['signingKey'] = $keys['example_key_id2'];
         $testConfig['signingKeyId'] = 'example_key_id2';
@@ -454,7 +456,7 @@ class OAuth2Test extends TestCase
         $testConfig = $this->signingMinimal;
         $keys = [
             'example_key_id1' => 'example_key1',
-            'example_key_id2' => 'example_key2'
+            'example_key_id2' => 'example_key2',
         ];
 
         $testConfig['signingKey'] = $keys['example_key_id2'];
@@ -476,7 +478,7 @@ class OAuth2Test extends TestCase
 
         $keys = [
             'example_key_id1' => 'example_key1',
-            'example_key_id2' => 'example_key2'
+            'example_key_id2' => 'example_key2',
         ];
         $testConfig['signingKey'] = $keys['example_key_id2'];
         $o = new OAuth2($testConfig);
@@ -564,7 +566,7 @@ class OAuth2Test extends TestCase
         $req = $o->generateCredentialsRequest();
         $this->assertInstanceOf(RequestInterface::class, $req);
         $this->assertEquals('POST', $req->getMethod());
-        $fields = Psr7\parse_query((string)$req->getBody());
+        $fields = Psr7\parse_query((string) $req->getBody());
         $this->assertEquals('authorization_code', $fields['grant_type']);
         $this->assertEquals('an_auth_code', $fields['code']);
     }
@@ -580,7 +582,7 @@ class OAuth2Test extends TestCase
         $req = $o->generateCredentialsRequest();
         $this->assertInstanceOf(RequestInterface::class, $req);
         $this->assertEquals('POST', $req->getMethod());
-        $fields = Psr7\parse_query((string)$req->getBody());
+        $fields = Psr7\parse_query((string) $req->getBody());
         $this->assertEquals('password', $fields['grant_type']);
         $this->assertEquals('a_password', $fields['password']);
         $this->assertEquals('a_username', $fields['username']);
@@ -596,7 +598,7 @@ class OAuth2Test extends TestCase
         $req = $o->generateCredentialsRequest();
         $this->assertInstanceOf(RequestInterface::class, $req);
         $this->assertEquals('POST', $req->getMethod());
-        $fields = Psr7\parse_query((string)$req->getBody());
+        $fields = Psr7\parse_query((string) $req->getBody());
         $this->assertEquals('refresh_token', $fields['grant_type']);
         $this->assertEquals('a_refresh_token', $fields['refresh_token']);
     }
@@ -609,7 +611,7 @@ class OAuth2Test extends TestCase
         $o = new OAuth2($testConfig);
         $o->setCode('an_auth_code');
         $request = $o->generateCredentialsRequest();
-        $fields = Psr7\parse_query((string)$request->getBody());
+        $fields = Psr7\parse_query((string) $request->getBody());
         $this->assertEquals('a_client_secret', $fields['client_secret']);
     }
 
@@ -620,7 +622,7 @@ class OAuth2Test extends TestCase
         $o = new OAuth2($testConfig);
         $o->setRefreshToken('a_refresh_token');
         $request = $o->generateCredentialsRequest();
-        $fields = Psr7\parse_query((string)$request->getBody());
+        $fields = Psr7\parse_query((string) $request->getBody());
         $this->assertEquals('a_client_secret', $fields['client_secret']);
     }
 
@@ -632,7 +634,7 @@ class OAuth2Test extends TestCase
         $o->setUsername('a_username');
         $o->setPassword('a_password');
         $request = $o->generateCredentialsRequest();
-        $fields = Psr7\parse_query((string)$request->getBody());
+        $fields = Psr7\parse_query((string) $request->getBody());
         $this->assertEquals('a_client_secret', $fields['client_secret']);
     }
 
@@ -647,7 +649,7 @@ class OAuth2Test extends TestCase
         $req = $o->generateCredentialsRequest();
         $this->assertInstanceOf(RequestInterface::class, $req);
         $this->assertEquals('POST', $req->getMethod());
-        $fields = Psr7\parse_query((string)$req->getBody());
+        $fields = Psr7\parse_query((string) $req->getBody());
         $this->assertEquals(OAuth2::JWT_URN, $fields['grant_type']);
         $this->assertArrayHasKey('assertion', $fields);
     }
@@ -663,7 +665,7 @@ class OAuth2Test extends TestCase
         $req = $o->generateCredentialsRequest();
         $this->assertInstanceOf(RequestInterface::class, $req);
         $this->assertEquals('POST', $req->getMethod());
-        $fields = Psr7\parse_query((string)$req->getBody());
+        $fields = Psr7\parse_query((string) $req->getBody());
         $this->assertEquals('my_value', $fields['my_param']);
         $this->assertEquals('urn:my_test_grant_type', $fields['grant_type']);
     }
@@ -858,7 +860,7 @@ class OAuth2Test extends TestCase
 
     private function jwtDecode(string $jwt, array $keys, array $algs): array
     {
-        $jwtClient = new FirebaseClient(new JWT, new JWK);
+        $jwtClient = new FirebaseClient(new JWT(), new JWK());
 
         return $jwtClient->decode($jwt, $keys, $algs);
     }

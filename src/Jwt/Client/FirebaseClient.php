@@ -56,11 +56,11 @@ class FirebaseClient implements ClientInterface
     public function getExpirationWithoutVerification(string $jwt): ?int
     {
         $parts = \explode('.', $jwt);
-        if (\count($tks) != 3) {
+        if (3 != \count($parts)) {
             throw new \InvalidArgumentException('Wrong number of segments');
         }
 
-        list($headerB64, $_, $_) = $parts;
+        list($headerB64, $payload, $signature) = $parts;
 
         $header = $this->jwt->jsonDecode(
             $this->jwt->urlsafeB64Decode($headerB64)

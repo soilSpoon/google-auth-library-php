@@ -22,6 +22,10 @@ use InvalidArgumentException;
 use LogicException;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @internal
+ * @coversNothing
+ */
 class ServiceAccountJwtAccessCredentialsTest extends TestCase
 {
     private const AUDIENCE = 'http://aud/';
@@ -32,7 +36,7 @@ class ServiceAccountJwtAccessCredentialsTest extends TestCase
         'client_email' => 'test@example.com',
         'client_id' => 'client123',
         'type' => 'service_account',
-        'project_id' => 'example_project'
+        'project_id' => 'example_project',
     ];
 
     private static $privateKey;

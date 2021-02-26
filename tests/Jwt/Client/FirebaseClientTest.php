@@ -27,6 +27,10 @@ use Google\Jwt\Client\FirebaseClient;
 use PHPUnit\Framework\TestCase;
 use UnexpectedValueException;
 
+/**
+ * @internal
+ * @coversNothing
+ */
 class FirebaseClientTest extends TestCase
 {
     /**
@@ -46,8 +50,10 @@ class FirebaseClientTest extends TestCase
                 if (self::$expectedException) {
                     $exceptionClass = self::$expectedException['class'];
                     $exceptionMessage = self::$expectedException['message'];
+
                     throw new $exceptionClass($exceptionMessage);
                 }
+
                 return self::$payload;
             }
         };
@@ -75,40 +81,41 @@ class FirebaseClientTest extends TestCase
 
     public function provideDecode()
     {
-        $payload =  [
+        $payload = [
             'iat' => time(),
             'exp' => time() + 30,
             'name' => 'foo',
             'iss' => GoogleAuth::OIDC_ISSUERS[0],
         ];
+
         return [
             [
                 'payload' => $payload,
                 'expectedException' => [
                     'class' => ExpiredException::class,
-                    'message' => 'expired!'
-                ]
+                    'message' => 'expired!',
+                ],
             ],
             [
                 'payload' => $payload,
                 'expectedException' => [
                     'class' => SignatureInvalidException::class,
-                    'message' => 'invalid signature!'
-                ]
+                    'message' => 'invalid signature!',
+                ],
             ],
             [
                 'payload' => $payload,
                 'expectedException' => [
                     'class' => UnexpectedValueException::class,
-                    'message' => 'invalid token!'
-                ]
+                    'message' => 'invalid token!',
+                ],
             ],
             [
                 'payload' => $payload,
                 'expectedException' => [
                     'class' => BeforeValidException::class,
-                    'message' => 'ineligible cbf!'
-                ]
+                    'message' => 'ineligible cbf!',
+                ],
             ],
         ];
     }
@@ -118,7 +125,7 @@ class FirebaseClientTest extends TestCase
         $this->expectException('UnexpectedValueException');
 
         $not_a_jwt = 'not a jwt';
-        $jwtClient = new FirebaseClient(new JWT, new JWK);
+        $jwtClient = new FirebaseClient(new JWT(), new JWK());
         $jwtClient->decode($not_a_jwt, ['keys' => []], ['algs']);
     }
 
@@ -134,7 +141,7 @@ class FirebaseClientTest extends TestCase
             'exp' => $now + 65, // arbitrary
             'iat' => $now,
         ];
-        $jwtClient = new FirebaseClient(new JWT, new JWK);
+        $jwtClient = new FirebaseClient(new JWT(), new JWK());
         $jwt = $jwtClient->encode($jwtPayload, $privateKey, 'RS256', 'kid');
 
         $decoded = $jwtClient->decode($jwt, ['kid' => $publicKey], ['RS256']);

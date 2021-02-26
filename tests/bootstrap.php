@@ -16,6 +16,7 @@
  */
 
 error_reporting(E_ALL | E_STRICT);
+
 require dirname(__DIR__) . '/vendor/autoload.php';
 date_default_timezone_set('UTC');
 
@@ -49,6 +50,7 @@ function httpClientFromCallable(callable $httpHandler): ClientInterface
             array $options = []
         ): ResponseInterface {
             $httpHandler = $this->httpHandler;
+
             return $httpHandler($request);
         }
 

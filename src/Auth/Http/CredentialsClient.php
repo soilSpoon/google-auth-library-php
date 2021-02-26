@@ -39,7 +39,7 @@ class CredentialsClient implements ClientInterface
 
     /**
      * @param CredentialsInterface $credentials
-     * @param ClientInterface $httpClient
+     * @param ClientInterface      $httpClient
      */
     public function __construct(
         CredentialsInterface $credentials,
@@ -54,7 +54,7 @@ class CredentialsClient implements ClientInterface
      * response.
      *
      * @param \Psr\Http\Message\RequestInterface $request
-     * @param array $options [optional]
+     * @param array                              $options [optional]
      *
      * @return \Psr\Http\Message\ResponseInterface
      */
@@ -65,6 +65,7 @@ class CredentialsClient implements ClientInterface
         foreach ($this->credentials->getRequestMetadata() as $name => $value) {
             $request = $request->withHeader($name, $value);
         }
+
         return $this->httpClient->send($request, $options);
     }
 
@@ -73,7 +74,7 @@ class CredentialsClient implements ClientInterface
      * PromiseInterface.
      *
      * @param \Psr\Http\Message\RequestInterface $request
-     * @param array $options [optional]
+     * @param array                              $options [optional]
      *
      * @return \Google\Http\Promise\PromiseInterface
      */
@@ -84,6 +85,7 @@ class CredentialsClient implements ClientInterface
         foreach ($this->credentials->getRequestMetadata() as $name => $value) {
             $request = $request->withHeader($name, $value);
         }
+
         return $this->httpClient->sendAsync($request, $options);
     }
 }

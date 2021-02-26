@@ -26,6 +26,10 @@ use InvalidArgumentException;
 use LogicException;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @internal
+ * @coversNothing
+ */
 class UserRefreshCredentialsTest extends TestCase
 {
     private $testJson = [
@@ -60,7 +64,7 @@ class UserRefreshCredentialsTest extends TestCase
 
         $notAnArrayOrString = new \stdClass();
         $credentials = new UserRefreshCredentials($this->testJson, [
-            'scope' => $notAnArrayOrString
+            'scope' => $notAnArrayOrString,
         ]);
     }
 
@@ -182,7 +186,7 @@ class UserRefreshCredentialsTest extends TestCase
     {
         $keyFile = __DIR__ . '/../fixtures/client_credentials.json';
         $credentials = new UserRefreshCredentials($keyFile, [
-            'scope' => 'a-scope'
+            'scope' => 'a-scope',
         ]);
         $this->assertEquals(
             'test_quota_project',

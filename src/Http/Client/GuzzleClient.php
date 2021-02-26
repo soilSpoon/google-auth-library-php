@@ -45,7 +45,7 @@ class GuzzleClient implements GoogleClientInterface
      * Accepts a PSR-7 request and an array of options and returns a PSR-7 response.
      *
      * @param RequestInterface $request
-     * @param array $options
+     * @param array            $options
      *
      * @return \Psr\Http\Message\ResponseInterface
      */
@@ -57,13 +57,14 @@ class GuzzleClient implements GoogleClientInterface
     }
 
     /**
-     * Accepts a PSR-7 request and an array of options and returns a PromiseInterface
+     * Accepts a PSR-7 request and an array of options and returns a PromiseInterface.
      *
      * @param \Psr\Http\Message\RequestInterface $request
-     * @param array $options
+     * @param array                              $options
+     *
+     * @throws \LogicException
      *
      * @return \Google\Http\Promise\PromiseInterface
-     * @throws \LogicException
      */
     public function sendAsync(
         RequestInterface $request,
@@ -82,6 +83,7 @@ class GuzzleClient implements GoogleClientInterface
             // Guzzle 7
             return GuzzleClientInterface::MAJOR_VERSION;
         }
+
         throw new \LogicException('Unable to detect Guzzle version');
     }
 }
